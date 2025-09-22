@@ -156,14 +156,14 @@ const Dashboard = () => {
           <div className="stat-card">
             <div className="stat-icon">💰</div>
             <div className="stat-content">
-              <h3 className="stat-value">${totalExpenses.toFixed(2)}</h3>
+              <h3 className="stat-value">₹{totalExpenses.toFixed(2)}</h3>
               <p className="stat-label">Total Expenses</p>
             </div>
           </div>
           <div className="stat-card">
             <div className="stat-icon">📅</div>
             <div className="stat-content">
-              <h3 className="stat-value">${monthlyExpenses.toFixed(2)}</h3>
+              <h3 className="stat-value">₹{monthlyExpenses.toFixed(2)}</h3>
               <p className="stat-label">This Month</p>
             </div>
           </div>
@@ -279,7 +279,7 @@ const Dashboard = () => {
                           {exp.category}
                         </span>
                       </div>
-                      <span className="expense-amount">${exp.amount}</span>
+                      <span className="expense-amount">₹{exp.amount}</span>
                     </div>
                   ))}
                 </div>
@@ -324,7 +324,7 @@ const Dashboard = () => {
               {filteredExpenses.map((exp) => (
                 <tr key={exp.id} className="table-row">
                   <td className="expense-title-cell">{exp.title}</td>
-                  <td className="expense-amount-cell">${exp.amount}</td>
+                  <td className="expense-amount-cell">₹{exp.amount}</td>
                   <td>
                     <span className={`category-badge category-${exp.category.toLowerCase()}`}>{exp.category}</span>
                   </td>
