@@ -73,58 +73,58 @@ export const getExpensesByCategory = async (category) => {
  * Get monthly expenses summary
  * year: 2025, month: 9
  */
-export const getMonthlyExpenses = async (year, month) => {
-  try {
-    const response = await axios.get(`${API_URL}/expenses/month/${year}/${month}`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data?.detail || error.message;
-  }
-};
+// export const getMonthlyExpenses = async (year, month) => {
+//   try {
+//     const response = await axios.get(`${API_URL}/expenses/month/${year}/${month}`, {
+//       headers: { Authorization: `Bearer ${getToken()}` },
+//     });
+//     return response.data;
+//   } catch (error) {
+//     throw error.response?.data?.detail || error.message;
+//   }
+// };
 
 /**
  * Get total expenses
  */
-export const getTotalExpenses = async () => {
-  try {
-    const response = await axios.get(`${API_URL}/expenses/summary/total`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data?.detail || error.message;
-  }
-};
+// export const getTotalExpenses = async () => {
+//   try {
+//     const response = await axios.get(`${API_URL}/expenses/summary/total`, {
+//       headers: { Authorization: `Bearer ${getToken()}` },
+//     });
+//     return response.data;
+//   } catch (error) {
+//     throw error.response?.data?.detail || error.message;
+//   }
+// };
 
 /**
  * Get expenses summary per category
  */
-export const getCategoryTotals = async () => {
-  try {
-    const response = await axios.get(`${API_URL}expenses/summary/category`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data?.detail || error.message;
-  }
-};
+// export const getCategoryTotals = async () => {
+//   try {
+//     const response = await axios.get(`${API_URL}expenses/summary/category`, {
+//       headers: { Authorization: `Bearer ${getToken()}` },
+//     });
+//     return response.data;
+//   } catch (error) {
+//     throw error.response?.data?.detail || error.message;
+//   }
+// };
 
 /**
  * Delete an expense by ID
  */
-export const deleteExpense = async (id) => {
-  try {
-    const response = await axios.delete(`${API_URL}/expenses/${id}`, {
-     headers: { Authorization: `Bearer ${getToken()}` },
-    });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data?.detail || error.message;
-  }
-};
+// export const deleteExpense = async (id) => {
+//   try {
+//     const response = await axios.delete(`${API_URL}/expenses/${id}`, {
+//      headers: { Authorization: `Bearer ${getToken()}` },
+//     });
+//     return response.data;
+//   } catch (error) {
+//     throw error.response?.data?.detail || error.message;
+//   }
+// };
 
 /**
  * Update an expense by ID

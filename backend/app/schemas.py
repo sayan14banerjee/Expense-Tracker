@@ -20,5 +20,16 @@ class ExpenseCreate(BaseModel):
     category: str
     date: str  # YYYY-MM-DD
 
-class ExpenseOut(ExpenseCreate):
+class ExpenseOut(BaseModel):
     id: str
+    title: str
+    amount: float
+    category: str
+    date: str
+
+
+class ExpenseUpdate(BaseModel):
+    title: str
+    amount: float
+    category: str
+    date: str

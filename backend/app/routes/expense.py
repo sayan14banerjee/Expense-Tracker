@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from app.schemas import ExpenseCreate, ExpenseOut
+from app.schemas import ExpenseCreate, ExpenseOut, ExpenseUpdate
 from app.functions.expense.create_expense import create_expense
+from app.functions.expense.update_expense import update_expense
 from app.functions.expense.get_expense import get_all_expenses, get_expenses_by_date
 from app.utils.auth import get_current_user
 
@@ -20,3 +21,8 @@ async def fetch_all_expenses(current_user: dict = Depends(get_current_user)):
 @router.get("/date/{date}", response_model=list[ExpenseOut])
 async def fetch_expenses_by_date(date: str, current_user: dict = Depends(get_current_user)):
     return await get_expenses_by_date(str(current_user["_id"]), date)
+
+# Router
+@router.put("/{id}", response_model=list[ExpenseOut])
+async def update_expense_route(id: str, expense: ExpenseUpdate, current_user: dict = Depends(get_current_user)):
+    return await update_expense(id, expense, current_user["_id"])

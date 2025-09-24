@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { logoutUser } from "../api/auth"
-import { createExpense, getAllExpenses, getExpensesByDate } from "../api/dashboard"
+import { createExpense, getAllExpenses, getExpensesByDate, updateExpense } from "../api/dashboard"
 import Calendar from "react-calendar"
 import "react-calendar/dist/Calendar.css"
 import "../styles/dashboard.css"
@@ -30,6 +30,16 @@ const Dashboard = () => {
   const [filterCategory, setFilterCategory] = useState("All")
   const [selectedDate, setSelectedDate] = useState(null)
   const [selectedDateExpenses, setSelectedDateExpenses] = useState([])
+
+  // Edit functionality states
+  const [editingExpense, setEditingExpense] = useState(null)
+  const [editForm, setEditForm] = useState({
+    title: "",
+    amount: "",
+    category: "",
+    date: "",
+  })
+  const [updating, setUpdating] = useState(false)
 
   // Helper function to format date consistently
   const formatDateToString = (date) => {
@@ -107,6 +117,66 @@ const Dashboard = () => {
       alert("Failed to add expense. Please try again.")
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  // Edit functionality handlers
+  const handleEditClick = (expense) => {
+    setEditingExpense(expense.id)
+    setEditForm({
+      title: expense.title,
+      amount: expense.amount.toString(),
+      category: expense.category,
+      date: expense.date,
+    })
+  }
+
+  const handleCancelEdit = () => {
+    setEditingExpense(null)
+    setEditForm({
+      title: "",
+      amount: "",
+      category: "",
+      date: "",
+    })
+  }
+
+  const handleUpdateExpense = async (expenseId) => {
+    try {
+      setUpdating(true)
+      const payload = {
+        title: editForm.title,
+        amount: Number.parseFloat(editForm.amount),
+        category: editForm.category,
+        date: editForm.date, // Note: API expects 'data' not 'date'
+      }
+
+      const updatedExpense = await updateExpense(expenseId, payload)
+      
+      // Update the expenses list
+      setExpenses(expenses.map(exp => 
+        exp.id === expenseId ? { ...exp, ...updatedExpense } : exp
+      ))
+
+      // Update selected date expenses if needed
+      if (selectedDate) {
+        const dateStr = formatDateToString(selectedDate)
+        const data = await getExpensesByDate(dateStr)
+        setSelectedDateExpenses(data)
+      }
+
+      setEditingExpense(null)
+      setEditForm({
+        title: "",
+        amount: "",
+        category: "",
+        date: "",
+      })
+    } catch (error) {
+      console.error("Failed to update expense:", error)
+      alert("Failed to update expense. Please try again.")
+    } finally {
+      setUpdating(false)
     }
   }
 
@@ -279,7 +349,16 @@ const Dashboard = () => {
                           {exp.category}
                         </span>
                       </div>
-                      <span className="expense-amount">₹{exp.amount}</span>
+                      <div className="expense-actions">
+                        <span className="expense-amount">₹{exp.amount}</span>
+                        <button 
+                          className="edit-btn"
+                          onClick={() => handleEditClick(exp)}
+                          disabled={editingExpense === exp.id}
+                        >
+                          ✏️
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -318,19 +397,97 @@ const Dashboard = () => {
                 <th>Amount</th>
                 <th>Category</th>
                 <th>Date</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredExpenses.map((exp) => (
                 <tr key={exp.id} className="table-row">
-                  <td className="expense-title-cell">{exp.title}</td>
-                  <td className="expense-amount-cell">₹{exp.amount}</td>
-                  <td>
-                    <span className={`category-badge category-${exp.category.toLowerCase()}`}>{exp.category}</span>
-                  </td>
-                  <td className="expense-date-cell">
-                    {createDateFromString(exp.date).toLocaleDateString()}
-                  </td>
+                  {editingExpense === exp.id ? (
+                    // Edit mode
+                    <>
+                      <td className="expense-title-cell">
+                        <input
+                          type="text"
+                          className="edit-input"
+                          value={editForm.title}
+                          onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                          disabled={updating}
+                        />
+                      </td>
+                      <td className="expense-amount-cell">
+                        <input
+                          type="number"
+                          step="0.01"
+                          className="edit-input"
+                          value={editForm.amount}
+                          onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })}
+                          disabled={updating}
+                        />
+                      </td>
+                      <td>
+                        <select
+                          className="edit-select"
+                          value={editForm.category}
+                          onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+                          disabled={updating}
+                        >
+                          <option value="Food">Food</option>
+                          <option value="Transport">Transport</option>
+                          <option value="Entertainment">Entertainment</option>
+                          <option value="Others">Others</option>
+                        </select>
+                      </td>
+                      <td className="expense-date-cell">
+                        <input
+                          type="date"
+                          className="edit-input"
+                          value={editForm.date}
+                          onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
+                          disabled={updating}
+                        />
+                      </td>
+                      <td className="expense-actions-cell">
+                        <div className="action-buttons">
+                          <button
+                            className="save-btn"
+                            onClick={() => handleUpdateExpense(exp.id)}
+                            disabled={updating}
+                          >
+                            {updating ? "💾..." : "💾"}
+                          </button>
+                          <button
+                            className="cancel-btn"
+                            onClick={handleCancelEdit}
+                            disabled={updating}
+                          >
+                            ❌
+                          </button>
+                        </div>
+                      </td>
+                    </>
+                  ) : (
+                    // View mode
+                    <>
+                      <td className="expense-title-cell">{exp.title}</td>
+                      <td className="expense-amount-cell">₹{exp.amount}</td>
+                      <td>
+                        <span className={`category-badge category-${exp.category.toLowerCase()}`}>{exp.category}</span>
+                      </td>
+                      <td className="expense-date-cell">
+                        {createDateFromString(exp.date).toLocaleDateString()}
+                      </td>
+                      <td className="expense-actions-cell">
+                        <button
+                          className="edit-btn"
+                          onClick={() => handleEditClick(exp)}
+                          disabled={editingExpense !== null}
+                        >
+                          ✏️ Edit
+                        </button>
+                      </td>
+                    </>
+                  )}
                 </tr>
               ))}
             </tbody>

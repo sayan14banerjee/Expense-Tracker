@@ -17,6 +17,8 @@ services:
       - MONGODB_URI=mongodb://mongo-db:27017/mydatabase
     depends_on:
       - mongo-db
+    volumes:
+      - ./backend:/app   # <-- Mount local code into container
 
   frontend:
     build: ./frontend
