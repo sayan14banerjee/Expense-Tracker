@@ -3,6 +3,7 @@ from app.schemas import ExpenseCreate, ExpenseOut, ExpenseUpdate
 from app.functions.expense.create_expense import create_expense
 from app.functions.expense.update_expense import update_expense
 from app.functions.expense.get_expense import get_all_expenses, get_expenses_by_date
+from app.functions.expense.delete_expense import delete_expense
 from app.utils.auth import get_current_user
 
 router = APIRouter(prefix="/expenses", tags=["Expenses"])
@@ -26,3 +27,7 @@ async def fetch_expenses_by_date(date: str, current_user: dict = Depends(get_cur
 @router.put("/{id}", response_model=list[ExpenseOut])
 async def update_expense_route(id: str, expense: ExpenseUpdate, current_user: dict = Depends(get_current_user)):
     return await update_expense(id, expense, current_user["_id"])
+
+@router.delete("/{id}", response_model=list[ExpenseOut])
+async def delete_expense_route(id: str, current_user: dict = Depends(get_current_user)):
+      return await delete_expense(id, current_user["_id"])

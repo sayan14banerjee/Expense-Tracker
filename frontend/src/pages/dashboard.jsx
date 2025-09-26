@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { logoutUser } from "../api/auth"
-import { createExpense, getAllExpenses, getExpensesByDate, updateExpense } from "../api/dashboard"
+import { createExpense, getAllExpenses, getExpensesByDate, updateExpense, deleteExpense } from "../api/dashboard"
 import Calendar from "react-calendar"
 import "react-calendar/dist/Calendar.css"
 import "../styles/dashboard.css"
@@ -40,6 +40,7 @@ const Dashboard = () => {
     date: "",
   })
   const [updating, setUpdating] = useState(false)
+  const [deletingId, setDeletingId] = useState(null) // New state for deleting expense
 
   // Helper function to format date consistently
   const formatDateToString = (date) => {
@@ -96,7 +97,7 @@ const Dashboard = () => {
     }
 
     loadExpensesByDate()
-  }, [selectedDate])
+  }, [selectedDate, expenses]) // Added 'expenses' to dependency array to refresh date list on general expense changes (add/delete/update)
 
   const handleAddExpense = async (e) => {
     e.preventDefault()
@@ -148,7 +149,7 @@ const Dashboard = () => {
         title: editForm.title,
         amount: Number.parseFloat(editForm.amount),
         category: editForm.category,
-        date: editForm.date, // Note: API expects 'data' not 'date'
+        date: editForm.date,
       }
 
       const updatedExpense = await updateExpense(expenseId, payload)
@@ -158,13 +159,8 @@ const Dashboard = () => {
         exp.id === expenseId ? { ...exp, ...updatedExpense } : exp
       ))
 
-      // Update selected date expenses if needed
-      if (selectedDate) {
-        const dateStr = formatDateToString(selectedDate)
-        const data = await getExpensesByDate(dateStr)
-        setSelectedDateExpenses(data)
-      }
-
+      // The selected date expenses list will be updated via the useEffect that watches 'expenses'
+      
       setEditingExpense(null)
       setEditForm({
         title: "",
@@ -177,6 +173,28 @@ const Dashboard = () => {
       alert("Failed to update expense. Please try again.")
     } finally {
       setUpdating(false)
+    }
+  }
+
+  // **New Delete Handler**
+  const handleDeleteExpense = async (expenseId) => {
+    if (window.confirm("Are you sure you want to delete this expense?")) {
+      try {
+        setDeletingId(expenseId)
+        // The API function returns the updated list of expenses after deletion
+        const updatedExpenses = await deleteExpense(expenseId)
+        
+        // Update the main expenses list with the returned data
+        setExpenses(updatedExpenses) 
+
+        // The selected date expenses list will update automatically due to the useEffect dependency
+        
+      } catch (error) {
+        console.error("Failed to delete expense:", error)
+        alert("Failed to delete expense. Please try again.")
+      } finally {
+        setDeletingId(null)
+      }
     }
   }
 
@@ -354,9 +372,17 @@ const Dashboard = () => {
                         <button 
                           className="edit-btn"
                           onClick={() => handleEditClick(exp)}
-                          disabled={editingExpense === exp.id}
+                          disabled={editingExpense === exp.id || deletingId !== null}
                         >
                           ✏️
+                        </button>
+                        {/* **DELETE BUTTON FOR DATE LIST** */}
+                        <button
+                          className="delete-btn"
+                          onClick={() => handleDeleteExpense(exp.id)}
+                          disabled={editingExpense !== null || deletingId === exp.id}
+                        >
+                          {deletingId === exp.id ? "🗑️..." : "🗑️"}
                         </button>
                       </div>
                     </div>
@@ -481,9 +507,17 @@ const Dashboard = () => {
                         <button
                           className="edit-btn"
                           onClick={() => handleEditClick(exp)}
-                          disabled={editingExpense !== null}
+                          disabled={editingExpense !== null || deletingId !== null}
                         >
                           ✏️ Edit
+                        </button>
+                        {/* **DELETE BUTTON FOR ALL EXPENSES TABLE** */}
+                        <button
+                          className="delete-btn"
+                          onClick={() => handleDeleteExpense(exp.id)}
+                          disabled={editingExpense !== null || deletingId === exp.id}
+                        >
+                          {deletingId === exp.id ? "🗑️ Deleting..." : "🗑️ Delete"}
                         </button>
                       </td>
                     </>

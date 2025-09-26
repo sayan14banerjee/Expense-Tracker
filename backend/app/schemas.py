@@ -33,3 +33,6 @@ class ExpenseUpdate(BaseModel):
     amount: float
     category: str
     date: str
+
+# class DeleteExpense(BaseModel):
+#     id: str

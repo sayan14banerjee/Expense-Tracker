@@ -58,16 +58,16 @@ export const getExpensesByDate = async (date) => {
  * Get expenses by category
  * category: "Food" | "Transport" | "Entertainment" | "Others"
  */
-export const getExpensesByCategory = async (category) => {
-  try {
-    const response = await axios.get(`${API_URL}/expenses/category/${category}`, {
-     headers: { Authorization: `Bearer ${getToken()}` },
-    });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data?.detail || error.message;
-  }
-};
+// export const getExpensesByCategory = async (category) => {
+//   try {
+//     const response = await axios.get(`${API_URL}/expenses/category/${category}`, {
+//      headers: { Authorization: `Bearer ${getToken()}` },
+//     });
+//     return response.data;
+//   } catch (error) {
+//     throw error.response?.data?.detail || error.message;
+//   }
+// };
 
 /**
  * Get monthly expenses summary
@@ -115,16 +115,16 @@ export const getExpensesByCategory = async (category) => {
 /**
  * Delete an expense by ID
  */
-// export const deleteExpense = async (id) => {
-//   try {
-//     const response = await axios.delete(`${API_URL}/expenses/${id}`, {
-//      headers: { Authorization: `Bearer ${getToken()}` },
-//     });
-//     return response.data;
-//   } catch (error) {
-//     throw error.response?.data?.detail || error.message;
-//   }
-// };
+export const deleteExpense = async (id) => {
+  try {
+    const response = await axios.delete(`${API_URL}/expenses/${id}`, {
+     headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data?.detail || error.message;
+  }
+};
 
 /**
  * Update an expense by ID
