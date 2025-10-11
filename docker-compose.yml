@@ -1,24 +1,14 @@
 version: "3"
 services:
-  mongo-db:
-    image: mongo
-    container_name: mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-
   backend:
     build: ./backend
     container_name: fastapi-backend
     ports:
       - "8000:8000"
     environment:
-      - MONGODB_URI=mongodb://mongo-db:27017/mydatabase
-    depends_on:
-      - mongo-db
+      - MONGODB_URI=mongodb+srv://banerjeesayan554_db_user:Kndw3rofBV4CBcIi@cluster0.l1snj1w.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
     volumes:
-      - ./backend:/app   # <-- Mount local code into container
+      - ./backend:/app   # Mount local code into container
 
   frontend:
     build: ./frontend
@@ -27,6 +17,3 @@ services:
       - "3000:3000"
     depends_on:
       - backend
-
-volumes:
-  mongo_data:
