@@ -1,7 +1,8 @@
 fastapi
 uvicorn[standard]
 motor
-pymongo
+pymongo[srv]==4.5.0
+dnspython>=2.3.0
 pydantic[email]
 bcrypt==4.0.1
 passlib[bcrypt]
